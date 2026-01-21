@@ -66,7 +66,7 @@
 
 ### 输入状态检测示例
 
-- **文件位置**：[examples/state_detection/main.py](examples/state_detection/main.py)
+- **文件位置**：[examples/inputs_detection/main.py](examples/inputs_detection/main.py)
 - **运行结果**：示例运行后会自动连接对应的手柄，连接成功后开发板串口将不再持续打印所有数据，而是**仅在按键状态发生变化时（如按键被按下或释放）输出对应的事件信息**。
 
 ## 许可证
