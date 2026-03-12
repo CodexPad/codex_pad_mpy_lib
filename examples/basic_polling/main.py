@@ -44,16 +44,22 @@ from codex_pad import (
     TX_POWER_6_DBM,  # 6dBm
 )
 
-print(f"setup")
-print(f"codex_pad lib version: {codex_pad.__version__}")
-codex_pad_obj = codex_pad.CodexPad(bluetooth.BLE())
+# Replace with your CodexPad device's Bluetooth device address
+# 替换为你的 CodexPad 的 Bluetooth device address
+_BLUETOOTH_DEVICE_ADDRESS = "0C:3D:5E:9D:80:DE"
 
-print("begin connecting")
-# 连接到指定MAC地址的手柄
-# Connect to the CodexPad with specified MAC address
-codex_pad_obj.connect("E4:66:E5:A2:24:5D")
+print("Setup")
 
-print(f"connected, model number is {codex_pad_obj.model_number}")
+print(f"The library version of codex_pad is: {codex_pad.__version__}")
+
+ble = bluetooth.BLE()
+codex_pad_obj = codex_pad.CodexPad(ble)
+
+print(f"Start to connect {_BLUETOOTH_DEVICE_ADDRESS}")
+
+codex_pad_obj.connect(_BLUETOOTH_DEVICE_ADDRESS)
+
+print(f"Connected, model number is {codex_pad_obj.model_number}")
 
 # 设置发射功率为0dBm
 # 发射功率影响通信距离和功耗：功率越高，通信距离越远，但功耗也越大
@@ -93,8 +99,8 @@ while True:
         f"Select:{int(codex_pad_obj.button_state(BUTTON_SELECT))},",
         f"Start:{int(codex_pad_obj.button_state(BUTTON_START))},",
         f"Home:{int(codex_pad_obj.button_state(BUTTON_HOME))}",
-        f"LAxis X:{codex_pad_obj.axis_value(AXIS_LEFT_STICK_X):>3},",
-        f"Y:{codex_pad_obj.axis_value(AXIS_LEFT_STICK_Y):>3},",
-        f"RAxis X:{codex_pad_obj.axis_value(AXIS_RIGHT_STICK_X):>3},",
-        f"Y:{codex_pad_obj.axis_value(AXIS_RIGHT_STICK_Y):>3}",
+        f"L(X:{codex_pad_obj.axis_value(AXIS_LEFT_STICK_X):>3},",
+        f"Y:{codex_pad_obj.axis_value(AXIS_LEFT_STICK_Y):>3}),",
+        f"R(X:{codex_pad_obj.axis_value(AXIS_RIGHT_STICK_X):>3},",
+        f"Y:{codex_pad_obj.axis_value(AXIS_RIGHT_STICK_Y):>3})",
     )
