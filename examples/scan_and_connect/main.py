@@ -1,9 +1,28 @@
 import asyncio
 import codex_pad
 
-# Replace with your CodexPad device's Bluetooth device address
-# 替换为你的 CodexPad 的 Bluetooth device address
-_BLUETOOTH_DEVICE_ADDRESS = "0C:3D:5E:9D:80:DE"
+
+# You can set a button mask to automatically connect when a target device is scanned and its button state matches this mask.
+# For example, you can set it to connect only when a specific button is pressed, or when multiple specified buttons are pressed simultaneously on the
+# device.
+# 你可以设置一个按钮掩码，当扫描到目标设备并检测到其按键状态与该掩码匹配时，自动进行连接。
+# 例如，可以设置为当设备上某个特定按键被按住，或多个指定按键被同时按住时才建立连接。
+
+# 【Important Warning】DO NOT use `codex_pad.BUTTON_HOME` (Home button) to set the button mask. Pressing and holding the Home button will trigger a device
+# reboot, which will interrupt the connection process or put the device into an unexpected state.
+# 【重要警告】请勿使用 `codex_pad.BUTTON_HOME` (Home键) 来设置按钮掩码。因为按住Home键会触发设备重启，这将导致连接过程中断或设备进入不可预期的状态。
+
+# Example: The button mask to match - Only the Start button
+# 示例：需要匹配的按钮掩码 - 仅Start按钮
+# _BUTTON_MASK = codex_pad.BUTTON_START
+
+# Example: The button mask to match - Start and CrossA buttons
+# 示例：需要匹配的按钮掩码 - Start 和 CrossA 按钮
+_BUTTON_MASK = codex_pad.BUTTON_START | codex_pad.BUTTON_CROSS_A
+
+# Example: The button mask to match - Start, CrossA, and SquareX buttons
+# 示例：需要匹配的按钮掩码 - Start、CrossA 和 SquareX 按钮
+# _BUTTON_MASK = codex_pad.BUTTON_START | codex_pad.BUTTON_CROSS_A | codex_pad.BUTTON_SQUARE_X
 
 
 def button_to_string(button):
@@ -30,13 +49,11 @@ def button_to_string(button):
     }[button]
 
 
-# Connect to the CodexPad device
-# 连接到 CodexPad 设备
-def Connect(bluetooth_device_address):
+def Connect(button_mask):
     while True:
         try:
-            print(f"Connecting to {bluetooth_device_address}")
-            asyncio.run(codex_pad_obj.connect(bluetooth_device_address, timeout_ms=5000))
+            print(f"Scanning and connecting to CodexPad with button mask: 0x{button_mask:08X}")
+            asyncio.run(codex_pad_obj.scan_and_connect(button_mask, scan_duration_ms=1000, connect_timeout_ms=5000))
             print(f"Remote device name: {codex_pad_obj.remote_device_name}")
             print(f"Remote model number: {codex_pad_obj.remote_model_number}")
             print(
@@ -54,6 +71,8 @@ def Connect(bluetooth_device_address):
             asyncio.run(codex_pad_obj.set_remote_tx_power(codex_pad.TX_POWER_0_DBM))
             print("Connected")
             return
+        except codex_pad.CodexPadNotFoundError as e:
+            print(f"{e}, trying again...")
         except asyncio.TimeoutError:
             print("Connection timed out, trying again...")
         except Exception as e:
@@ -64,7 +83,8 @@ def Connect(bluetooth_device_address):
 print("codex_pad library version:", codex_pad.__version__)
 codex_pad_obj = codex_pad.CodexPad()
 
-Connect(_BLUETOOTH_DEVICE_ADDRESS)
+Connect(_BUTTON_MASK)
+
 
 # Main loop
 while True:
@@ -78,7 +98,7 @@ while True:
 
     if not codex_pad_obj.is_connected:
         print("Disconnected from device, trying to reconnect...")
-        Connect(_BLUETOOTH_DEVICE_ADDRESS)
+        Connect(_BUTTON_MASK)
         continue
 
     # 检测所有按钮的状态变化
@@ -123,15 +143,15 @@ while True:
     # 阈值设置为2，只有当摇杆值变化达到或超过2个单位时才认为是有效变化
     # Check if joystick axis values have changed significantly (using threshold to avoid minor jitter)
     # Threshold is set to 2, only consider changes equal to or greater than 2 units as significant
-    AXIS_VALUE_CHANGE_THRESHOLD = 2
+    _AXIS_VALUE_CHANGE_THRESHOLD = 2
 
     # 检测摇杆X轴或Y轴是否有显著变化
     # Check if stick X or Y axis has significant change
     if (
-        codex_pad_obj.has_axis_value_changed(codex_pad.AXIS_LEFT_STICK_X, AXIS_VALUE_CHANGE_THRESHOLD)
-        or codex_pad_obj.has_axis_value_changed(codex_pad.AXIS_LEFT_STICK_Y, AXIS_VALUE_CHANGE_THRESHOLD)
-        or codex_pad_obj.has_axis_value_changed(codex_pad.AXIS_RIGHT_STICK_X, AXIS_VALUE_CHANGE_THRESHOLD)
-        or codex_pad_obj.has_axis_value_changed(codex_pad.AXIS_RIGHT_STICK_Y, AXIS_VALUE_CHANGE_THRESHOLD)
+        codex_pad_obj.has_axis_value_changed(codex_pad.AXIS_LEFT_STICK_X, _AXIS_VALUE_CHANGE_THRESHOLD)
+        or codex_pad_obj.has_axis_value_changed(codex_pad.AXIS_LEFT_STICK_Y, _AXIS_VALUE_CHANGE_THRESHOLD)
+        or codex_pad_obj.has_axis_value_changed(codex_pad.AXIS_RIGHT_STICK_X, _AXIS_VALUE_CHANGE_THRESHOLD)
+        or codex_pad_obj.has_axis_value_changed(codex_pad.AXIS_RIGHT_STICK_Y, _AXIS_VALUE_CHANGE_THRESHOLD)
     ):
         print(
             f"L(X: {codex_pad_obj.axis_value(codex_pad.AXIS_LEFT_STICK_X):>3},",
