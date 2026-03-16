@@ -13,16 +13,21 @@
 
 ## 支持的硬件平台
 
+**理论支持范围**：本库理论上支持所有**具备蓝牙功能**、并**运行了支持标准BLE接口的MicroPython固件**的硬件平台。您可以通过 [MicroPython官方下载页面（已筛选BLE功能）](https://micropython.org/download/?features=BLE)来查找和确认适合您设备的、支持蓝牙的官方固件。
+
+下表列出了我们已测试可用的部分硬件平台：
+
 | 支持的硬件平台 |
 | :--- |
 | ESP32 |
-| ESP32-S2 |
 | ESP32-S3 |
+| ESP32-C2 |
 | ESP32-C3 |
 | ESP32-C5 |
 | ESP32-C6 |
-| ESP32-H2 |
 | ESP32-P4 |
+| Raspberry Pi Pico W |
+| Raspberry Pi Pico 2 W |
 
 ## 特性
 
@@ -64,15 +69,34 @@
 
 ### 安装 **aioble** 依赖库
 
-本库依赖 aioble库来实现蓝牙通信功能。在安装本库前，请确保您的主机设备（ESP32）已连接网络，并先行安装 aioble库。您可以选择以下任一方法进行安装：
+#### 平台差异与验证
 
-#### 方法一：在设备REPL中通过mip安装
+本库依赖 aioble库来实现蓝牙通信。根据您所使用的硬件平台，aioble库的提供方式可能不同：
 
-此方法通过在 MicroPython 的交互式环境（REPL）中直接执行 Python 代码来完成安装。
+**ESP32 系列**：绝大多数 MicroPython 固件不预装​ **aioble** 库，您必须通过下方提供的方法进行安装。
+
+**Raspberry Pi Pico W / Pico 2 W**：官方 MicroPython 固件通常已预装​ **aioble** 库。您可以直接尝试导入，无需执行安装步骤。
+
+在开始安装前，建议您先运行以下代码进行验证：
+
+```python
+try:
+    import aioble
+    print("The aioble library is already present. You can skip the installation.")
+except ImportError:
+    print("The aioble library not found. Please proceed with the installation using one of the methods below.")
+    # 对于 ESP32 用户，通常需要继续执行安装
+```
+
+如果验证结果显示需要安装，请根据您的设备是否已连接网络，选择以下任一方法。
+
+#### 方法一：在设备REPL中通过mip安装（需要硬件设备网络）
+
+> **⚠️ 重要提示**：此方法要求您的MicroPython设备本身（如ESP32）必须能够连接Wi-Fi并访问互联网。mip安装器会在设备端直接下载库文件。如果您的设备不具备网络功能（例如某些仅支持BLE的定制开发板），此方法将无法使用，请改用下方的“方法二”。
 
 1. **确保网络连接**：请务必确保您的设备可以正常连接到互联网。您可能需要提前准备并测试好连接 Wi-Fi 的代码。
 
-2. **执行安装代码**：在 MicroPython REPL 中，依次输入并执行以下命令。您也可以将这段代码保存为 main.py文件，通过 Thonny 等工具上传到设备并运行，效果相同。
+2. **执行安装代码**：在 MicroPython REPL 中，依次输入并执行以下命令。您也可以将这段代码保存为`main.py`文件，通过 Thonny 等工具上传到设备并运行，效果相同。
 
     ```python
     import network
@@ -117,7 +141,7 @@
 
 **重要提示**：
 
-- **网络依赖**：此方法完全依赖网络。如果安装失败，请首先检查设备的 Wi-Fi 连接是否正常，并确保其可以访问 `micropython.org` 的包索引服务。
+- **网络依赖**：此方法完全依赖设备本机的网络连接。如果安装失败，请首先检查设备的Wi-Fi连接是否正常，并确保其可以访问`micropython.org`的包索引服务。
 
 - **重试机制**：若安装过程中因网络问题中断，您可以重新执行`mip.install("aioble")`命令进行重试。
 
