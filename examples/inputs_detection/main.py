@@ -40,7 +40,7 @@ def Connect(bluetooth_device_address):
             print(f"Remote device name: {codex_pad_obj.remote_device_name}")
             print(f"Remote model number: {codex_pad_obj.remote_model_number}")
             print(
-                f"Remote firmware version: {codex_pad_obj.remote_firmware_version[0], codex_pad_obj.remote_firmware_version[1], codex_pad_obj.remote_firmware_version[2]}"
+                f"Remote firmware version: {codex_pad_obj.remote_firmware_version_major}.{codex_pad_obj.remote_firmware_version_minor}.{codex_pad_obj.remote_firmware_version_patch}"
             )
             print(f"Remote Bluetooth Device Address: {codex_pad_obj.remote_bluetooth_device_address}")
 
@@ -74,7 +74,7 @@ while True:
     # Important: update() method must be called as frequently as possible in the loop, no delays should be added
     # This method processes all received Bluetooth packets, delays will cause data loss and response lag
     # For real-time control applications, high-frequency calls are essential to ensure prompt response to gamepad input
-    codex_pad_obj.update()
+    asyncio.run(codex_pad_obj.update())
 
     if not codex_pad_obj.is_connected:
         print("Disconnected from device, trying to reconnect...")

@@ -1,11 +1,10 @@
 import bluetooth
 import struct
-import asyncio
 import aioble
 from collections import deque
 from micropython import const
 
-__version__ = "2.0.0"
+__version__ = "2.1.0"
 
 TX_POWER_MINUS_16_DBM = const(-16)
 TX_POWER_MINUS_12_DBM = const(-12)
@@ -98,21 +97,20 @@ class CodexPad:
                 return
             [
                 self.button_states,
-                self.axis_values[0],
-                self.axis_values[1],
-                self.axis_values[2],
-                self.axis_values[3],
+                self.axis_values[AXIS_LEFT_STICK_X],
+                self.axis_values[AXIS_LEFT_STICK_Y],
+                self.axis_values[AXIS_RIGHT_STICK_X],
+                self.axis_values[AXIS_RIGHT_STICK_Y],
             ] = struct.unpack(_INPUTS_UNPACK_FMT, data)
 
         def assign(self, other):
             self.button_states = other.button_states
-            for i in range(len(self.axis_values)):
-                self.axis_values[i] = other.axis_values[i]
+            self.axis_values = other.axis_values[:]
 
     def __init__(self):
         self._remote_model_number = None
         self._remote_device_name = None
-        self.__remote_firmware_revision = None
+        self._remote_firmware_version = None
         self._connection = None
         self._inputs_characteristic = None
         self._tx_power_characteristic = None
@@ -122,7 +120,7 @@ class CodexPad:
     async def _reset(self):
         self._remote_model_number = None
         self._remote_device_name = None
-        self.__remote_firmware_revision = None
+        self._remote_firmware_version = None
         if self._connection:
             await self._connection.disconnect()
         self._connection = None
@@ -138,7 +136,11 @@ class CodexPad:
             async for result in scanner:
                 if not result.name() or not result.name().startswith("CodexPad-"):
                     continue
+
                 if not result.manufacturer():
+                    continue
+
+                if not result.rssi:
                     continue
 
                 mfr_data = list(result.manufacturer(0xFFFF))
@@ -164,7 +166,7 @@ class CodexPad:
                 if button_state != button_mask:
                     continue
 
-                if rssi is None or result.rssi > rssi:
+                if device is None or result.rssi > rssi:
                     rssi = result.rssi
                     device = result.device
 
@@ -193,7 +195,7 @@ class CodexPad:
         self._remote_model_number = (await model_number_characteristic.read()).decode("utf-8")
 
         firmware_revision_characteristic = await device_info_service.characteristic(_FIRMWARE_REVISION_STRING_UUID)
-        self._remote_firmware_version = struct.unpack("BBB", (await firmware_revision_characteristic.read()))
+        self._remote_firmware_version = tuple(struct.unpack(_FIRMWARE_VERSION_UNPACK_FMT, (await firmware_revision_characteristic.read())))
 
         tx_power_service = await connection.service(_TX_POWER_SERVICE_UUID)
         tx_power_characteristic = await tx_power_service.characteristic(_TX_POWER_CHARACTERISTIC_UUID)
@@ -208,8 +210,7 @@ class CodexPad:
         self._connection = connection
 
     async def disconnect(self):
-        if self._connection:
-            await self._connection.disconnect()
+        self._reset()
 
     async def set_remote_tx_power(self, tx_power):
         self._tx_power_characteristic.write(struct.pack("<b", tx_power), timeout_ms=5000)
@@ -227,6 +228,18 @@ class CodexPad:
         return self._remote_firmware_version
 
     @property
+    def remote_firmware_version_major(self):
+        return self._remote_firmware_version[0]
+
+    @property
+    def remote_firmware_version_minor(self):
+        return self._remote_firmware_version[1]
+
+    @property
+    def remote_firmware_version_patch(self):
+        return self._remote_firmware_version[2]
+
+    @property
     def remote_bluetooth_device_address(self):
         return self._connection.device.addr_hex().upper()
 
@@ -234,7 +247,7 @@ class CodexPad:
     def is_connected(self):
         return self._connection and self._connection.is_connected()
 
-    def update(self):
+    async def update(self):
         self._prev_inputs.assign(self._current_inputs)
 
         if self._connection == None or self._inputs_characteristic == None or not self._connection.is_connected():
