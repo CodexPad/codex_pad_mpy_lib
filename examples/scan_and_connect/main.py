@@ -76,7 +76,9 @@ def Connect(button_mask):
         except asyncio.TimeoutError:
             print("Connection timed out, trying again...")
         except Exception as e:
-            print(f"Connection failed: {e}")
+            print(f"Connection failed: {e}, trying again...")
+            import aioble
+            aioble.core.stop()
 
 
 # Set up

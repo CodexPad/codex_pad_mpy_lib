@@ -36,7 +36,7 @@ def Connect(bluetooth_device_address):
     while True:
         try:
             print(f"Connecting to {bluetooth_device_address}")
-            asyncio.run(codex_pad_obj.connect(bluetooth_device_address, timeout_ms=5000))
+            asyncio.run(codex_pad_obj.connect(bluetooth_device_address, timeout_ms=60000))
             print(f"Remote device name: {codex_pad_obj.remote_device_name}")
             print(f"Remote model number: {codex_pad_obj.remote_model_number}")
             print(
@@ -57,7 +57,9 @@ def Connect(bluetooth_device_address):
         except asyncio.TimeoutError:
             print("Connection timed out, trying again...")
         except Exception as e:
-            print(f"Connection failed: {e}")
+            print(f"Connection failed: {e}, trying again...")
+            import aioble
+            aioble.core.stop()
 
 
 # Set up

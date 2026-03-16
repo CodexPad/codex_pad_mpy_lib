@@ -4,7 +4,7 @@ import aioble
 from collections import deque
 from micropython import const
 
-__version__ = "2.1.0"
+__version__ = "2.1.1"
 
 TX_POWER_MINUS_16_DBM = const(-16)
 TX_POWER_MINUS_12_DBM = const(-12)
@@ -87,11 +87,6 @@ class CodexPad:
             self.button_states = 0
             self.axis_values = [AXIS_CENTER, AXIS_CENTER, AXIS_CENTER, AXIS_CENTER]
 
-        def reset(self):
-            self.button_states = 0
-            for i in range(len(self.axis_values)):
-                self.axis_values[i] = AXIS_CENTER
-
         def parse_and_set(self, data: bytes):
             if not data or len(data) != _INPUTS_DATA_LENGTH:
                 return
@@ -126,8 +121,8 @@ class CodexPad:
         self._connection = None
         self._inputs_characteristic = None
         self._tx_power_characteristic = None
-        self._prev_inputs.reset()
-        self._current_inputs.reset()
+        self._prev_inputs = CodexPad.Inputs()
+        self._current_inputs = CodexPad.Inputs()
 
     async def scan_and_connect(self, button_mask, scan_duration_ms=1000, connect_timeout_ms=5000):
         rssi = None
@@ -179,41 +174,42 @@ class CodexPad:
         await self._connect(device, connect_timeout_ms)
 
     async def connect(self, mac_address, timeout_ms):
-        self._reset()
         await self._connect(aioble.Device(aioble.ADDR_PUBLIC, mac_address), timeout_ms)
 
     async def _connect(self, device, timeout_ms):
-        self._reset()
-        connection = await device.connect(timeout_ms)
+        await self._reset()
+        try:
+            self._connection = await device.connect(timeout_ms=timeout_ms, scan_duration_ms=1000)
 
-        gap_service = await connection.service(_GAP_SERVICE_UUID)
-        device_name_characteristic = await gap_service.characteristic(_GAP_DEVICE_NAME_UUID)
-        self._remote_device_name = (await device_name_characteristic.read()).decode("utf-8")
+            gap_service = await self._connection.service(_GAP_SERVICE_UUID)
+            device_name_characteristic = await gap_service.characteristic(_GAP_DEVICE_NAME_UUID)
+            self._remote_device_name = (await device_name_characteristic.read()).decode("utf-8")
 
-        device_info_service = await connection.service(_DEVICE_INFO_SERVICE_UUID)
-        model_number_characteristic = await device_info_service.characteristic(_MODEL_NUMBER_STRING_UUID)
-        self._remote_model_number = (await model_number_characteristic.read()).decode("utf-8")
+            device_info_service = await self._connection.service(_DEVICE_INFO_SERVICE_UUID)
+            model_number_characteristic = await device_info_service.characteristic(_MODEL_NUMBER_STRING_UUID)
+            self._remote_model_number = (await model_number_characteristic.read()).decode("utf-8")
 
-        firmware_revision_characteristic = await device_info_service.characteristic(_FIRMWARE_REVISION_STRING_UUID)
-        self._remote_firmware_version = tuple(struct.unpack(_FIRMWARE_VERSION_UNPACK_FMT, (await firmware_revision_characteristic.read())))
+            firmware_revision_characteristic = await device_info_service.characteristic(_FIRMWARE_REVISION_STRING_UUID)
+            self._remote_firmware_version = tuple(struct.unpack(_FIRMWARE_VERSION_UNPACK_FMT, (await firmware_revision_characteristic.read())))
 
-        tx_power_service = await connection.service(_TX_POWER_SERVICE_UUID)
-        tx_power_characteristic = await tx_power_service.characteristic(_TX_POWER_CHARACTERISTIC_UUID)
-        self._tx_power_characteristic = tx_power_characteristic
+            tx_power_service = await self._connection.service(_TX_POWER_SERVICE_UUID)
+            tx_power_characteristic = await tx_power_service.characteristic(_TX_POWER_CHARACTERISTIC_UUID)
+            self._tx_power_characteristic = tx_power_characteristic
 
-        inputs_service = await connection.service(_INPUTS_SERVICE_UUID)
-        inputs_characteristic = await inputs_service.characteristic(_INPUTS_CHARACTERISTIC_UUID)
-        await inputs_characteristic.subscribe(notify=True)
-        inputs_characteristic._notify_queue = deque((), 5)
-        self._inputs_characteristic = inputs_characteristic
-
-        self._connection = connection
+            inputs_service = await self._connection.service(_INPUTS_SERVICE_UUID)
+            inputs_characteristic = await inputs_service.characteristic(_INPUTS_CHARACTERISTIC_UUID)
+            await inputs_characteristic.subscribe(notify=True)
+            inputs_characteristic._notify_queue = deque((), 5)
+            self._inputs_characteristic = inputs_characteristic
+        except Exception as e:
+            await self._reset()
+            raise e
 
     async def disconnect(self):
-        self._reset()
+        await self._reset()
 
     async def set_remote_tx_power(self, tx_power):
-        self._tx_power_characteristic.write(struct.pack("<b", tx_power), timeout_ms=5000)
+        await self._tx_power_characteristic.write(struct.pack("<b", tx_power), timeout_ms=5000)
 
     @property
     def remote_device_name(self):
