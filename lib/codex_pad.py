@@ -11,7 +11,7 @@ TX_POWER_MINUS_12_DBM = const(-12)
 TX_POWER_MINUS_8_DBM = const(-8)
 TX_POWER_MINUS_5_DBM = const(-5)
 TX_POWER_MINUS_3_DBM = const(-3)
-TX_POWER_MINUS_1_DBM = const(-0)
+TX_POWER_MINUS_1_DBM = const(-1)
 TX_POWER_0_DBM = const(0)
 TX_POWER_1_DBM = const(1)
 TX_POWER_2_DBM = const(2)
@@ -209,6 +209,56 @@ class CodexPad:
         await self._reset()
 
     async def set_remote_tx_power(self, tx_power):
+        """
+        设置远程设备（手柄）的蓝牙发射功率。
+        Set the Bluetooth transmission power of the remote device (controller).
+
+        参数/Parameter tx_power: 发射功率等级，单位为 dBm。必须为以下预定义常量之一：
+                               Transmission power level in dBm. Must be one of the following predefined constants:
+                               - `TX_POWER_MINUS_16_DBM`  (-16 dBm)
+                               - `TX_POWER_MINUS_12_DBM`  (-12 dBm)
+                               - `TX_POWER_MINUS_8_DBM`   ( -8 dBm)
+                               - `TX_POWER_MINUS_5_DBM`   ( -5 dBm)
+                               - `TX_POWER_MINUS_3_DBM`   ( -3 dBm)
+                               - `TX_POWER_MINUS_1_DBM`   ( -1 dBm)
+                               - `TX_POWER_0_DBM`         (  0 dBm)
+                               - `TX_POWER_1_DBM`         (  1 dBm)
+                               - `TX_POWER_2_DBM`         (  2 dBm)
+                               - `TX_POWER_3_DBM`         (  3 dBm)
+                               - `TX_POWER_4_DBM`         (  4 dBm)
+                               - `TX_POWER_5_DBM`         (  5 dBm)
+                               - `TX_POWER_6_DBM`         (  6 dBm)
+
+        发射功率影响通信距离和功耗：功率越高，通信距离越远，但功耗也越大。
+        Transmission power affects communication range and power consumption:
+        Higher power provides longer range but consumes more battery.
+
+        建议根据实际应用场景选择合适的功率等级以平衡距离和电池寿命。
+        Choose an appropriate power level based on your application to balance range and battery life.
+
+        抛出/Raises:
+            ValueError: 如果 `tx_power` 不是上述预定义的功率常量之一。
+                   If `tx_power` is not one of the predefined power constants above.
+        """
+        _VALID_TX_POWER_VALUES = {
+            TX_POWER_MINUS_16_DBM,
+            TX_POWER_MINUS_12_DBM,
+            TX_POWER_MINUS_8_DBM,
+            TX_POWER_MINUS_5_DBM,
+            TX_POWER_MINUS_3_DBM,
+            TX_POWER_MINUS_1_DBM,
+            TX_POWER_0_DBM,
+            TX_POWER_1_DBM,
+            TX_POWER_2_DBM,
+            TX_POWER_3_DBM,
+            TX_POWER_4_DBM,
+            TX_POWER_5_DBM,
+            TX_POWER_6_DBM,
+        }
+
+        if tx_power not in _VALID_TX_POWER_VALUES:
+            raise ValueError(f"Invalid tx_power value: {tx_power}")
+
         await self._tx_power_characteristic.write(struct.pack("<b", tx_power), timeout_ms=5000)
 
     @property

@@ -1,7 +1,6 @@
 import asyncio
 import codex_pad
 
-
 # You can set a button mask to automatically connect when a target device is scanned and its button state matches this mask.
 # For example, you can set it to connect only when a specific button is pressed, or when multiple specified buttons are pressed simultaneously on the
 # device.
@@ -14,15 +13,27 @@ import codex_pad
 
 # Example: The button mask to match - Only the Start button
 # 示例：需要匹配的按钮掩码 - 仅Start按钮
+#
 # _BUTTON_MASK = codex_pad.BUTTON_START
+#
+#   --> 匹配条件：按住且仅按住 Start 键。
+#   --> Condition: Start button must be pressed, and no other buttons.
 
 # Example: The button mask to match - Start and CrossA buttons
 # 示例：需要匹配的按钮掩码 - Start 和 CrossA 按钮
+#
 _BUTTON_MASK = codex_pad.BUTTON_START | codex_pad.BUTTON_CROSS_A
+#
+#   --> 匹配条件：同时按住且仅按住 Start 和 CrossA 两个键。
+#   --> Condition: Simultaneously press and hold only the Start and CrossA buttons.
 
 # Example: The button mask to match - Start, CrossA, and SquareX buttons
 # 示例：需要匹配的按钮掩码 - Start、CrossA 和 SquareX 按钮
+#
 # _BUTTON_MASK = codex_pad.BUTTON_START | codex_pad.BUTTON_CROSS_A | codex_pad.BUTTON_SQUARE_X
+#
+#   --> 匹配条件：同时按住且仅按住 Start、CrossA 和 SquareX 三个键。
+#   --> Condition: Simultaneously press and hold only the Start, CrossA, and SquareX buttons.
 
 
 def button_to_string(button):
@@ -78,6 +89,7 @@ def Connect(button_mask):
         except Exception as e:
             print(f"Connection failed: {e}, trying again...")
             import aioble
+
             aioble.core.stop()
 
 
