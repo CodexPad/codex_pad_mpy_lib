@@ -13,7 +13,7 @@
 
 ## 支持的硬件平台
 
-**理论支持范围**：本库理论上支持所有**具备蓝牙功能**、并**运行了支持标准BLE接口的MicroPython固件**的硬件平台。您可以通过 [MicroPython官方下载页面（已筛选BLE功能）](https://micropython.org/download/?features=BLE)来查找和确认适合您设备的、支持蓝牙的官方固件。
+**理论支持范围**：本库理论上支持所有运行了内置标准**bluetooth**模块的**MicroPython**固件、且硬件本身具备 **低功耗蓝牙（BLE）** 功能的开发平台。您可以通过 [MicroPython官方下载页面（已筛选BLE功能）](https://micropython.org/download/?features=BLE)来查找和确认适合您设备的、支持蓝牙的官方固件。
 
 下表列出了我们已测试可用的部分硬件平台：
 
