@@ -4,7 +4,7 @@ import aioble
 from collections import deque
 from micropython import const
 
-__version__ = "2.1.1"
+__version__ = "2.1.2"
 
 TX_POWER_MINUS_16_DBM = const(-16)
 TX_POWER_MINUS_12_DBM = const(-12)
