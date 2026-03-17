@@ -4,7 +4,7 @@ import aioble
 from collections import deque
 from micropython import const
 
-__version__ = "2.1.2"
+__version__ = "2.1.3"
 
 TX_POWER_MINUS_16_DBM = const(-16)
 TX_POWER_MINUS_12_DBM = const(-12)
@@ -173,8 +173,8 @@ class CodexPad:
 
         await self._connect(device, connect_timeout_ms)
 
-    async def connect(self, mac_address, timeout_ms):
-        await self._connect(aioble.Device(aioble.ADDR_PUBLIC, mac_address), timeout_ms)
+    async def connect(self, bluetooth_device_address, timeout_ms):
+        await self._connect(aioble.Device(aioble.ADDR_PUBLIC, bluetooth_device_address), timeout_ms)
 
     async def _connect(self, device, timeout_ms):
         await self._reset()
