@@ -1,10 +1,11 @@
 import bluetooth
 import struct
 import aioble
+import asyncio
 from collections import deque
 from micropython import const
 
-__version__ = "2.1.3"
+__version__ = "2.2.0"
 
 TX_POWER_MINUS_16_DBM = const(-16)
 TX_POWER_MINUS_12_DBM = const(-12)
@@ -147,7 +148,7 @@ class CodexPad:
                 if len(manufacturer_data) < _MANUFACTURER_DATA_LENGTH:
                     continue
 
-                unpacked = struct.unpack(_MANUFACTURER_DATA_UNPACK_FMT, manufacturer_data)
+                unpacked = struct.unpack(_MANUFACTURER_DATA_UNPACK_FMT, manufacturer_data[:_MANUFACTURER_DATA_LENGTH])
 
                 header_bytes = bytes(unpacked[: len(_MANUFACTURER_HEADER)])
 
@@ -299,8 +300,10 @@ class CodexPad:
         if self._connection == None or self._inputs_characteristic == None or not self._connection.is_connected():
             return
 
-        if self._inputs_characteristic._notify_queue and len(self._inputs_characteristic._notify_queue) > 0:
-            self._current_inputs.parse_and_set(self._inputs_characteristic._notify_queue.popleft())
+        try:
+            self._current_inputs.parse_and_set(await self._inputs_characteristic.notified(timeout_ms=1))
+        except Exception:
+            pass
 
     def pressed(self, button):
         return ((self._prev_inputs.button_states & button) == 0) and ((self._current_inputs.button_states & button) != 0)
