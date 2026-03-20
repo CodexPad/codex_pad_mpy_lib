@@ -10,8 +10,8 @@
 
 | CodexPad型号 | 产品详情链接 |
 | :--- | :--- |
-| CodexPad-C10 | [1. 大陆版 (Gitee）链接（推荐中国大陆用户查看)](https://gitee.com/CodexPad/codex_pad_c10#codexpad-c10)<br>[2. 国际版 (GitHub）链接](https://github.com/CodexPad/codex_pad_c10/blob/main/README_CN.md#codexpad-c10) |
-| CodexPad-S10 | [1. 大陆版 (Gitee）链接（推荐中国大陆用户查看)](https://gitee.com/CodexPad/codex_pad_s10#codexpad-s10) <br> [2. 国际版 (GitHub）链接](https://github.com/CodexPad/codex_pad_s10/blob/main/README_CN.md#codexpad-s10) |
+| CodexPad-C10 | [1. 大陆版（Gitee）链接（推荐中国大陆用户查看)](https://gitee.com/CodexPad/codex_pad_c10#codexpad-c10)<br>[2. 国际版（GitHub）链接](https://github.com/CodexPad/codex_pad_c10/blob/main/README_CN.md#codexpad-c10) |
+| CodexPad-S10 | [1. 大陆版（Gitee）链接（推荐中国大陆用户查看)](https://gitee.com/CodexPad/codex_pad_s10#codexpad-s10) <br> [2. 国际版（GitHub）链接](https://github.com/CodexPad/codex_pad_s10/blob/main/README_CN.md#codexpad-s10) |
 
 ## 支持的硬件平台
 
@@ -191,9 +191,9 @@ __import__('aioble'); print('aioble library is ready')
 
     *请根据您所在的网络环境，选择以下任一链接下载，库内容完全相同*：
 
-    - **大陆版 (Gitee，推荐中国大陆用户使用)**：[https://gitee.com/CodexPad/codex_pad_mpy_lib/archive/refs/tags/v2.2.1.zip](https://gitee.com/CodexPad/codex_pad_mpy_lib/archive/refs/tags/v2.2.1.zip)
+    - [大陆版（Gitee）下载链接（推荐中国大陆用户使用)](https://gitee.com/CodexPad/codex_pad_mpy_lib/archive/refs/tags/v2.2.1.zip)
 
-    - **国际版 (GitHub)**：[https://github.com/CodexPad/codex_pad_mpy_lib/archive/refs/tags/v2.2.1.zip](https://github.com/CodexPad/codex_pad_mpy_lib/archive/refs/tags/v2.2.1.zip)
+    - [国际版（GitHub）下载链接](https://github.com/CodexPad/codex_pad_mpy_lib/archive/refs/tags/v2.2.1.zip)
 
 2. **解压文件**
 
