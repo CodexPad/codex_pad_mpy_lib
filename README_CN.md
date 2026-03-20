@@ -1,4 +1,4 @@
-# 🎮 CodexPad MicroPython 库
+# CodexPad MicroPython Lib
 
 [English](README.md)
 
@@ -6,10 +6,12 @@
 
 本库为**CodexPad**系列手柄提供的**MicroPython**库，支持ESP32系列开发板通过蓝牙连接并读取CodexPad手柄的所有按键与摇杆输入状态。关于 CodexPad 产品的详细信息，请查阅以下产品文档。
 
-| CodexPad型号 | 链接 |
+*每个型号的产品文档在以下两个链接的内容相同，请根据您的网络环境选择链接查看*：
+
+| CodexPad型号 | 产品详情链接 |
 | :--- | :--- |
-| CodexPad-C10 | <https://github.com/CodexPad/codex_pad_c10> |
-| CodexPad-S10 | <https://github.com/CodexPad/codex_pad_s10> |
+| CodexPad-C10 | [1. 大陆版 (Gitee）链接（推荐中国大陆用户查看)](https://gitee.com/CodexPad/codex_pad_c10#codexpad-c10)<br>[2. 国际版 (GitHub）链接](https://github.com/CodexPad/codex_pad_c10/blob/main/README_CN.md#codexpad-c10) |
+| CodexPad-S10 | [1. 大陆版 (Gitee）链接（推荐中国大陆用户查看)](https://gitee.com/CodexPad/codex_pad_s10#codexpad-s10) <br> [2. 国际版 (GitHub）链接](https://github.com/CodexPad/codex_pad_s10/blob/main/README_CN.md#codexpad-s10) |
 
 ## 支持的硬件平台
 
@@ -185,9 +187,23 @@ __import__('aioble'); print('aioble library is ready')
 
 ### 安装 CodexPad 库
 
-1. 从本仓库的 `lib/` 目录下获取 `codex_pad.py` 库文件。
+1. **下载库文件**
 
-2. 使用 **Thonny**、**ampy** 或 **rshell** 等工具，将该库文件`codex_pad.py`上传到您主机设备的**文件系统根目录（`/`）** 下，或者 **`/lib/`** 目录下。
+    *请根据您所在的网络环境，选择以下任一链接下载，库内容完全相同*：
+
+    - **大陆版 (Gitee，推荐中国大陆用户使用)**：[https://gitee.com/CodexPad/codex_pad_mpy_lib/archive/refs/tags/v2.2.1.zip](https://gitee.com/CodexPad/codex_pad_mpy_lib/archive/refs/tags/v2.2.1.zip)
+
+    - **国际版 (GitHub)**：[https://github.com/CodexPad/codex_pad_mpy_lib/archive/refs/tags/v2.2.1.zip](https://github.com/CodexPad/codex_pad_mpy_lib/archive/refs/tags/v2.2.1.zip)
+
+2. **解压文件**
+
+    将下载的 `codex_pad_mpy_lib-x.x.x.zip` 压缩包解压到本地文件夹。
+
+3. **上传库文件**
+
+    在解压后的文件夹中，找到 `codex_pad.py` 文件。
+
+    使用 **Thonny**、**ampy** 或 **rshell** 等工具，将该文件上传到您的 MicroPython 设备文件系统的 **根目录 (`/`)** 或 **`/lib/`** 目录下。
 
 ## 示例说明
 
