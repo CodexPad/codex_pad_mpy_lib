@@ -187,7 +187,7 @@ __import__('aioble'); print('aioble library is ready')
 
 1. **下载库文件**
 
-    **下载链接**：[codex_pad_mpy_lib-x.x.x.zip](../../../codex_pad_mpy_lib/archive/refs/tags/v2.2.1.zip)
+    **下载链接**：[codex_pad_mpy_lib-x.x.x.zip](../../../codex_pad_mpy_lib/archive/refs/tags/v2.3.0.zip)
 
 2. **解压文件**
 
@@ -217,8 +217,8 @@ __import__('aioble'); print('aioble library is ready')
 
 - **文件位置**：[examples/scan_and_connect/main.py](examples/scan_and_connect/main.py)
 - **示例说明**：通过匹配特定的自定义的**按键**或者**按键组合**来扫描并自动连接附近的 CodexPad 设备，检测摇杆和按键变化并打印。
-- **操作步骤**：代码启动后进入扫描连接状态，此时按住手柄上你代码中指定的按键掩码（按键组合）直到主机连接到手柄为止，之后正常操作手柄观察控制台的日志输出。
-- **重要警告**：按钮掩码中**绝对禁止**包含 `Home` 键，因为长按 Home 键会导致手柄重启，从而中断连接。
+- **操作步骤**：代码启动后进入扫描连接状态，手柄开机后蓝灯闪烁，此时按住手柄上你代码中指定的按键掩码（按键组合）直到主机连接到手柄为止，之后正常操作手柄观察控制台的日志输出。
+- **重要提示**：设置按钮掩码时，**请勿单独使用 `Home` 键**。长按 `Home` 键会导致手柄关机，从而中断连接。如确需使用 `Home` 键，请务必采用组合按键（如 `Home` + `Cross`）。
 
 ## 许可证
 

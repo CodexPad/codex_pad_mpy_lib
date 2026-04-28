@@ -5,7 +5,7 @@ import asyncio
 from collections import deque
 from micropython import const
 
-__version__ = "2.2.1"
+__version__ = "2.3.0"
 
 TX_POWER_MINUS_16_DBM = const(-16)
 TX_POWER_MINUS_12_DBM = const(-12)
@@ -68,8 +68,8 @@ _FIRMWARE_VERSION_UNPACK_FMT = "BBB"
 _MANUFACTURER_HEADER_UNPACK_FMT = "B" * len(_MANUFACTURER_HEADER)
 
 _MANUFACTURER_FIRMWARE_VERSION_LENGTH = len(_FIRMWARE_VERSION_UNPACK_FMT)
-_MANUFACTURER_DATA_LENGTH = len(_MANUFACTURER_HEADER) + _MANUFACTURER_FIRMWARE_VERSION_LENGTH + 4
-_MANUFACTURER_DATA_UNPACK_FMT = "<" + _MANUFACTURER_HEADER_UNPACK_FMT + _FIRMWARE_VERSION_UNPACK_FMT + _BUTTON_STATE_UNPACK_FMT
+_MANUFACTURER_DATA_LENGTH = len(_MANUFACTURER_HEADER) + _MANUFACTURER_FIRMWARE_VERSION_LENGTH + 4 + 1
+_MANUFACTURER_DATA_UNPACK_FMT = "<" + _MANUFACTURER_HEADER_UNPACK_FMT + _FIRMWARE_VERSION_UNPACK_FMT + _BUTTON_STATE_UNPACK_FMT + "B"
 
 _AXIS_VALUE_UNPACK_FMT = "BBBB"
 _INPUTS_UNPACK_FMT = "<" + _BUTTON_STATE_UNPACK_FMT + _AXIS_VALUE_UNPACK_FMT
@@ -155,11 +155,18 @@ class CodexPad:
                 if header_bytes != _MANUFACTURER_HEADER:
                     continue
 
-                # firmware_version = bytes(unpacked[len(_MANUFACTURER_HEADER) : len(_MANUFACTURER_HEADER) + _MANUFACTURER_FIRMWARE_VERSION_LENGTH])
+                firmware_version = bytes(unpacked[len(_MANUFACTURER_HEADER) : len(_MANUFACTURER_HEADER) + _MANUFACTURER_FIRMWARE_VERSION_LENGTH])
+                # print(f"Found CodexPad device: {result.name()}, address: {result.device}, rssi: {result.rssi}, manufacturer_data: {manufacturer_data}, firmware_version: {firmware_version}")
 
                 button_state = unpacked[len(_MANUFACTURER_HEADER) + _MANUFACTURER_FIRMWARE_VERSION_LENGTH]
 
                 if button_state != button_mask:
+                    continue
+
+                button_states_duration_seconds = unpacked[-1]
+                # print(f"button_states_duration_seconds: {button_states_duration_seconds}")
+
+                if firmware_version[0] > 1 and button_states_duration_seconds < 1:
                     continue
 
                 if device is None or result.rssi > rssi:

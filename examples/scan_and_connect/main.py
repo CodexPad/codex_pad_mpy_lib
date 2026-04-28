@@ -7,28 +7,29 @@ import codex_pad
 # 你可以设置一个按钮掩码，当扫描到目标设备并检测到其按键状态与该掩码匹配时，自动进行连接。
 # 例如，可以设置为当设备上某个特定按键被按住，或多个指定按键被同时按住时才建立连接。
 
-# 【Important Warning】DO NOT use `codex_pad.BUTTON_HOME` (Home button) to set the button mask. Pressing and holding the Home button will trigger a device
-# reboot, which will interrupt the connection process or put the device into an unexpected state.
-# 【重要警告】请勿使用 `codex_pad.BUTTON_HOME` (Home键) 来设置按钮掩码。因为按住Home键会触发设备重启，这将导致连接过程中断或设备进入不可预期的状态。
+# 【Important Warning】DO NOT use `codex_pad.BUTTON_HOME` (Home button) alone to set the button mask. Pressing and holding the Home button will trigger a
+# device shutdown. If you need to use the Home button, it is recommended to use it in combination with other buttons (e.g., Home + Cross).
+# 【重要警告】请勿单独使用 `codex_pad.BUTTON_HOME` (Home键) 来设置按钮掩码。因为按住Home键会触发设备关机。如需使用Home键，建议采用组合按键方式（例如 Home +
+# Cross）。
 
-# Example: The button mask to match - Only the Start button
-# 示例：需要匹配的按钮掩码 - 仅Start按钮
+# Example 1: The button mask to match - Only the Start button
+# 示例 1：需要匹配的按钮掩码 - 仅Start按钮
 #
 # _BUTTON_MASK = codex_pad.BUTTON_START
 #
 #   --> 匹配条件：按住且仅按住 Start 键。
 #   --> Condition: Start button must be pressed, and no other buttons.
 
-# Example: The button mask to match - Start and CrossA buttons
-# 示例：需要匹配的按钮掩码 - Start 和 CrossA 按钮
+# Example 2: The button mask to match - Start and CrossA buttons
+# 示例 2：需要匹配的按钮掩码 - Start 和 CrossA 按钮
 #
 _BUTTON_MASK = codex_pad.BUTTON_START | codex_pad.BUTTON_CROSS_A
 #
 #   --> 匹配条件：同时按住且仅按住 Start 和 CrossA 两个键。
 #   --> Condition: Simultaneously press and hold only the Start and CrossA buttons.
 
-# Example: The button mask to match - Start, CrossA, and SquareX buttons
-# 示例：需要匹配的按钮掩码 - Start、CrossA 和 SquareX 按钮
+# Example 3: The button mask to match - Start, CrossA, and SquareX buttons
+# 示例 3：需要匹配的按钮掩码 - Start、CrossA 和 SquareX 按钮
 #
 # _BUTTON_MASK = codex_pad.BUTTON_START | codex_pad.BUTTON_CROSS_A | codex_pad.BUTTON_SQUARE_X
 #
