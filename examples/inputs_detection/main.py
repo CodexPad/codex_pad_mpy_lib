@@ -3,7 +3,7 @@ import codex_pad
 
 # Replace with your CodexPad device's Bluetooth device address
 # 替换为你的 CodexPad 的 Bluetooth device address
-_BLUETOOTH_DEVICE_ADDRESS = "0C:3D:5E:9D:80:DE"
+_BLUETOOTH_DEVICE_ADDRESS = "0C:3D:5E:A4:5F:86"
 
 
 def button_to_string(button):

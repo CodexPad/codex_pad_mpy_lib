@@ -187,7 +187,7 @@ __import__('aioble'); print('aioble library is ready')
 
 1. **下载库文件**
 
-    **下载链接**：[codex_pad_mpy_lib-x.x.x.zip](../../../codex_pad_mpy_lib/archive/refs/tags/v2.3.0.zip)
+    **下载链接**：[codex_pad_mpy_lib-x.x.x.zip](../../../codex_pad_mpy_lib/archive/refs/tags/v2.3.1.zip)
 
 2. **解压文件**
 
