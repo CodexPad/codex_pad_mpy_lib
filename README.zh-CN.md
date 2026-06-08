@@ -105,15 +105,14 @@
 
 本库依赖aioble库来实现蓝牙通信。根据您所使用的硬件平台，aioble库的提供方式可能不同：
 
-**ESP32 系列**：绝大多数 MicroPython 固件不预装​ **aioble** 库，您必须通过下方提供的方法进行安装。
+- **ESP32 系列**：绝大多数 MicroPython 固件不预装​ **aioble** 库，您必须通过下方提供的方法进行安装。
 
-**Raspberry Pi Pico W / Pico 2 W**：官方 MicroPython 固件通常已预装​ **aioble** 库。您可以直接尝试导入，无需执行安装步骤。
+- **Raspberry Pi Pico W / Pico 2 W**：官方 MicroPython 固件通常已预装​ **aioble** 库。您可以直接尝试导入，无需执行安装步骤。
 
 在开始安装前，建议在 MicroPython 的 REPL 环境中，输入并执行以下单行命令进行验证：
 
 ```python
 __import__('aioble'); print('aioble library is ready')
-
 ```
 
 **如果控制台打印出 aioble library is ready**：表明aioble库已存在，您可以跳过后续的安装步骤。
@@ -148,7 +147,6 @@ __import__('aioble'); print('aioble library is ready')
     # 安装 aioble 库
     import mip
     mip.install("aioble")
-
     ```
 
 3. **安装结果**：安装成功后，您将在 REPL 中看到类似以下的输出，表明库文件已成功拷贝到设备的 /lib目录下：
