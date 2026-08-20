@@ -1,9 +1,10 @@
 import bluetooth
 import struct
 import aioble
+import asyncio
 from micropython import const
 
-__version__ = "2.3.1"
+__version__ = "3.0.0"
 
 TX_POWER_MINUS_16_DBM = const(-16)
 TX_POWER_MINUS_12_DBM = const(-12)
@@ -123,7 +124,10 @@ class CodexPad:
         self._prev_inputs = CodexPad.Inputs()
         self._current_inputs = CodexPad.Inputs()
 
-    async def scan_and_connect(self, button_mask, scan_duration_ms=1000, connect_timeout_ms=5000):
+    def scan_and_connect(self, button_mask, scan_duration_ms=1000, connect_timeout_ms=5000):
+        asyncio.get_event_loop().run_until_complete(self._scan_and_connect(button_mask, scan_duration_ms, connect_timeout_ms))
+
+    async def _scan_and_connect(self, button_mask, scan_duration_ms, connect_timeout_ms):
         rssi = None
         device = None
         async with aioble.scan(scan_duration_ms, interval_us=50000, window_us=20000, active=True) as scanner:
@@ -179,8 +183,8 @@ class CodexPad:
 
         await self._connect(device, connect_timeout_ms)
 
-    async def connect(self, bluetooth_device_address, timeout_ms):
-        await self._connect(aioble.Device(aioble.ADDR_PUBLIC, bluetooth_device_address), timeout_ms)
+    def connect(self, bluetooth_device_address, timeout_ms):
+        asyncio.get_event_loop().run_until_complete(self._connect(aioble.Device(aioble.ADDR_PUBLIC, bluetooth_device_address), timeout_ms))
 
     async def _connect(self, device, timeout_ms):
         await self._reset()
@@ -210,10 +214,10 @@ class CodexPad:
             await self._reset()
             raise e
 
-    async def disconnect(self):
-        await self._reset()
+    def disconnect(self):
+        asyncio.get_event_loop().run_until_complete(self._reset())
 
-    async def set_remote_tx_power(self, tx_power):
+    def set_remote_tx_power(self, tx_power):
         """
         设置远程设备（手柄）的蓝牙发射功率。
         Set the Bluetooth transmission power of the remote device (controller).
@@ -264,7 +268,7 @@ class CodexPad:
         if tx_power not in _VALID_TX_POWER_VALUES:
             raise ValueError(f"Invalid tx_power value: {tx_power}")
 
-        await self._tx_power_characteristic.write(struct.pack("<b", tx_power), timeout_ms=5000)
+        asyncio.get_event_loop().run_until_complete(self._tx_power_characteristic.write(struct.pack("<b", tx_power), timeout_ms=5000))
 
     @property
     def remote_device_name(self):
@@ -298,14 +302,14 @@ class CodexPad:
     def is_connected(self):
         return self._connection and self._connection.is_connected()
 
-    async def update(self):
+    def update(self):
         self._prev_inputs.assign(self._current_inputs)
 
         if self._connection is None or self._inputs_characteristic is None or not self._connection.is_connected():
             return
 
         try:
-            self._current_inputs.parse_and_set(await self._inputs_characteristic.notified(timeout_ms=1))
+            self._current_inputs.parse_and_set(asyncio.get_event_loop().run_until_complete(self._inputs_characteristic.notified(timeout_ms=1)))
         except Exception:
             pass
 

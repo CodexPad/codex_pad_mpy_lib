@@ -61,11 +61,11 @@ def button_to_string(button):
     }[button]
 
 
-def Connect(button_mask):
+def connect(button_mask):
     while True:
         try:
             print(f"Scanning and connecting to CodexPad with button mask: 0x{button_mask:08X}")
-            asyncio.run(codex_pad_obj.scan_and_connect(button_mask, scan_duration_ms=1000, connect_timeout_ms=5000))
+            codex_pad_obj.scan_and_connect(button_mask, scan_duration_ms=1000, connect_timeout_ms=2000)
             print(f"Remote device name: {codex_pad_obj.remote_device_name}")
             print(f"Remote model number: {codex_pad_obj.remote_model_number}")
             print(
@@ -80,7 +80,7 @@ def Connect(button_mask):
             # Transmission power affects communication range and power consumption:
             # Higher power provides longer range but consumes more battery
             # Choose appropriate power level based on your application to balance range and battery life
-            asyncio.run(codex_pad_obj.set_remote_tx_power(codex_pad.TX_POWER_0_DBM))
+            codex_pad_obj.set_remote_tx_power(codex_pad.TX_POWER_0_DBM)
             print("Connected")
             return
         except codex_pad.CodexPadNotFoundError as e:
@@ -98,7 +98,7 @@ def Connect(button_mask):
 print("codex_pad library version:", codex_pad.__version__)
 codex_pad_obj = codex_pad.CodexPad()
 
-Connect(_BUTTON_MASK)
+connect(_BUTTON_MASK)
 
 
 # Main loop
@@ -109,11 +109,11 @@ while True:
     # Important: update() method must be called as frequently as possible in the loop, no delays should be added
     # This method processes all received Bluetooth packets, delays will cause data loss and response lag
     # For real-time control applications, high-frequency calls are essential to ensure prompt response to gamepad input
-    asyncio.run(codex_pad_obj.update())
+    codex_pad_obj.update()
 
     if not codex_pad_obj.is_connected:
         print("Disconnected from device, trying to reconnect...")
-        Connect(_BUTTON_MASK)
+        connect(_BUTTON_MASK)
         continue
 
     # 检测所有按钮的状态变化

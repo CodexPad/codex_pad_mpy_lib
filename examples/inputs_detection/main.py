@@ -3,7 +3,7 @@ import codex_pad
 
 # Replace with your CodexPad device's Bluetooth device address
 # 替换为你的 CodexPad 的 Bluetooth device address
-_BLUETOOTH_DEVICE_ADDRESS = "0C:3D:5E:A4:5F:86"
+_BLUETOOTH_DEVICE_ADDRESS = "16:00:00:00:02:72"
 
 
 def button_to_string(button):
@@ -32,11 +32,11 @@ def button_to_string(button):
 
 # Connect to the CodexPad device
 # 连接到 CodexPad 设备
-def Connect(bluetooth_device_address):
+def connect(bluetooth_device_address):
     while True:
         try:
             print(f"Connecting to {bluetooth_device_address}")
-            asyncio.run(codex_pad_obj.connect(bluetooth_device_address, timeout_ms=60000))
+            codex_pad_obj.connect(bluetooth_device_address, timeout_ms=2000)
             print(f"Remote device name: {codex_pad_obj.remote_device_name}")
             print(f"Remote model number: {codex_pad_obj.remote_model_number}")
             print(
@@ -51,7 +51,7 @@ def Connect(bluetooth_device_address):
             # Transmission power affects communication range and power consumption:
             # Higher power provides longer range but consumes more battery
             # Choose appropriate power level based on your application to balance range and battery life
-            asyncio.run(codex_pad_obj.set_remote_tx_power(codex_pad.TX_POWER_0_DBM))
+            codex_pad_obj.set_remote_tx_power(codex_pad.TX_POWER_0_DBM)
             print("Connected")
             return
         except asyncio.TimeoutError:
@@ -66,7 +66,7 @@ def Connect(bluetooth_device_address):
 print("codex_pad library version:", codex_pad.__version__)
 codex_pad_obj = codex_pad.CodexPad()
 
-Connect(_BLUETOOTH_DEVICE_ADDRESS)
+connect(_BLUETOOTH_DEVICE_ADDRESS)
 
 # Main loop
 while True:
@@ -76,11 +76,11 @@ while True:
     # Important: update() method must be called as frequently as possible in the loop, no delays should be added
     # This method processes all received Bluetooth packets, delays will cause data loss and response lag
     # For real-time control applications, high-frequency calls are essential to ensure prompt response to gamepad input
-    asyncio.run(codex_pad_obj.update())
+    codex_pad_obj.update()
 
     if not codex_pad_obj.is_connected:
         print("Disconnected from device, trying to reconnect...")
-        Connect(_BLUETOOTH_DEVICE_ADDRESS)
+        connect(_BLUETOOTH_DEVICE_ADDRESS)
         continue
 
     # 检测所有按钮的状态变化
