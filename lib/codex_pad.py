@@ -4,7 +4,7 @@ import aioble
 import asyncio
 from micropython import const
 
-__version__ = "3.0.0"
+__version__ = "3.0.1"
 
 TX_POWER_MINUS_16_DBM = const(-16)
 TX_POWER_MINUS_12_DBM = const(-12)

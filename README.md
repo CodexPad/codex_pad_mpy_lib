@@ -4,12 +4,7 @@
 
 ## Overview
 
-This library is the **MicroPython** for the **CodexPad** series controllers. It supports ESP32 series development boards in connecting to and reading the input status of all buttons and joysticks on a CodexPad controller via Bluetooth. For detailed information about CodexPad products, please refer to the product documentation below.
-
-| CodexPad Model | Details |
-| :--- | :--- |
-| CodexPad-C10 | [Product Details](../../../codex_pad_c10/blob/main/README.md#codexpad-c10) |
-| CodexPad-S10 | [Product Details](../../../codex_pad_s10/blob/main/README.md#codexpad-s10) |
+This library is the **MicroPython** for the **CodexPad** series controllers. It supports ESP32 series development boards in connecting to and reading the input status of all buttons and joysticks on a CodexPad controller via Bluetooth.
 
 ## Supported Hardware Platforms
 
@@ -25,55 +20,17 @@ The following table lists the available hardware platforms that we have tested:
 | ESP32-C3 |
 | ESP32-C5 |
 | ESP32-C6 |
-| ESP32-P4 |
 | Raspberry Pi Pico W |
 | Raspberry Pi Pico 2 W |
 
 ## Features
 
 - **Flexible Dual-Mode Connection**:
-
-  - **Direct Connection via Bluetooth Device Address**: Quickly establish a stable connection with a specific controller using a known Bluetooth Device Address.
-
-  - **Button Mask Scan Connection**: Connect without knowing the Bluetooth Device Address in advance. By scanning for and matching a specific combination of buttons held down on the target controller (defined as a "button mask" in your code), the library automatically connects to the device with the strongest signal (highest RSSI), enabling fast and flexible pairing.
-
+  - **Direct Connection via Address**: Quickly establish a stable connection with a specific controller using a known Bluetooth Device Address.
+  - **Button Mask Connection**: By scanning for and matching a specific combination of buttons held down on the target controller (defined as a "button mask" in your code), the library automatically connects to the device with the strongest signal (highest RSSI), enabling fast and flexible pairing.
 - **Real-time Button Event Detection**: Reads the input status of all buttons in real time, distinguishing between **Pressed**, **Released**, and **Holding** events.
-
 - **High-Precision Joystick Data**: Retrieves analog values for the X and Y axes of the left and right joysticks, ranging from 0 to 255, providing precise control input.
-
 - **Adjustable Transmit Power**: Allows dynamic adjustment of the Bluetooth transmit power within a range of **-16 dBm to +6 dBm** based on the application scenario (e.g., distance, power requirements).
-
-## Detailed Explanation of Button Mask Scan Connection
-
-**Button Mask Scan Connection** is a distinctive feature of CodexPad, allowing the host to connect by scanning for and matching a specific combination of buttons held down on the device. This method establishes a physical "handshake" protocol between the device and the host, offering significant advantages in multi-device environments and flexible pairing scenarios.
-
-### Design Intent and Advantages
-
-1. **Preventing Accidental Connections and Interference**: When multiple connectable devices of the same type (e.g., multiple controllers) are nearby, while their unique **Bluetooth Device Address** can be used for precise connection, this typically requires "hardcoding" the address in the code. This approach binds the program to a specific device, lacking flexibility. By requiring the target device to hold a specific button combination while being discovered, a dynamic, condition-based connection rule is defined. Your connection code is not bound to any device's physical address; as long as a device satisfies this "handshake protocol" (holding the correct buttons), it will be connected. This effectively prevents the host from accidentally connecting to the wrong device among multiple devices, while enabling the convenience of **connect on press, with the ability to switch devices at any time**.
-
-2. **Creating Exclusive Connection Conditions**: You can think of this button mask as a simple "password" or "connection token." It creates an exclusive connection channel between your application and the device, allowing only devices that meet this specific physical interaction condition (pressing the designated buttons) to join, enhancing the intentionality and control of the connection.
-
-3. **Improving Code Flexibility, Supporting On-the-Fly Device Switching**: Unlike hardcoding a specific device's Bluetooth Device Address, the connection logic using a button mask is oriented towards a "condition" rather than a "specific device." This means your same set of connection code, without modification, can be used to connect to any controller that is discoverable and correctly triggers the preset button condition. This offers two major conveniences:
-
-    - **No Need to Bind to a Specific Device**: You don't need to specify a controller's address in the code, nor maintain different connection configurations for different controllers.
-
-    - **Connect on Press, Flexible Switching**: In practical use, you can pick up another controller at any time. As long as it is powered on and holding the correct button combination, your program can automatically connect to it, enabling seamless switching between different controllers.
-
-### Working principle and operating steps
-
-1. **Set the mask**: Define a **button mask** in your code and assign it to the relevant parameters of the connection function.
-
-2. **Turn on the device**: Power on your controller to make it discoverable via Bluetooth (the controller’s indicator should flash slowly at this point).
-
-3. **Execute connection**: Run your program. While the program is scanning, precisely press and hold all the buttons defined in your mask on the target controller.
-
-4. **Automatic pairing**: When the program scans a device, it checks whether the button state exactly matches the preset mask (all specified buttons are pressed and no unspecified button is pressed). Once a match is found, the program automatically connects to the device with the strongest signal among matching devices.
-
-> **⚠️ Important Warning**: The button mask MUST NEVER include the BUTTON_HOME (Home button). Pressing and holding the Home button triggers a system reset of the controller, which will directly interrupt the connection process and put the device into an unpredictable state.
-
-### Example
-
-The library provides full code implementation for this feature. Please refer to the examples and code in later sections.
 
 ## Usage Instructions
 
@@ -83,13 +40,7 @@ Before starting to program, complete the following preparations to ensure a smoo
 
 #### Familiarize Yourself with the Product Documentation
 
-Read the CodexPad product manual in detail to fully understand the hardware features, familiarize yourself with the controller's button/joystick layout, function definitions, indicator light statuses, and power on/off operations.
-
-#### Obtain and Record the Controller's Bluetooth Device Address (BD_ADDR)
-
-> ⚠️ Important Note: The direct connection example in this library connects using the Bluetooth Device Address (BD_ADDR). When programming, you must explicitly specify your controller's Bluetooth Device Address (BD_ADDR) in the code.
-
-Please refer to the method provided in the product manual to obtain your controller's **Bluetooth Device Address (BD_ADDR)**. It is typically in the format "`E4:66:E5:A2:24:5D`"(consisting of characters 0-9, A-F, with colons as half-width symbols). Record this information properly, as you will need to input your controller's actual **Bluetooth Device Address (BD_ADDR)** in the code later.
+Read the CodexPad product manual in detail to fully understand the hardware features, familiarize yourself with the controller's button/joystick layout, function definitions, indicator light statuses, obtaining address, and power on/off operations.
 
 #### Power On the Controller and Enter Pairing Mode
 
@@ -185,7 +136,7 @@ __import__('aioble'); print('aioble library is ready')
 
 1. **Download the library file**
 
-    **Download link**: [codex_pad_mpy_lib-x.x.x.zip](../../../codex_pad_mpy_lib/archive/refs/tags/v3.0.0.zip)
+    **Download link**: [codex_pad_mpy_lib-x.x.x.zip](../../../codex_pad_mpy_lib/archive/refs/tags/v3.0.1.zip)
 
 2. **Extract the files**
 
@@ -217,6 +168,10 @@ The example code contains detailed comments. It is recommended to read the code 
 - **Description**: Scans for and automatically connects to a nearby CodexPad device by matching a specific custom **button** or **button combination**, then detects joystick and button changes and prints them.
 - **Steps**: After the code starts, it enters the scan-and-connect state. When the gamepad is powered on and the blue light flashes, press and hold the button mask (button combination) specified in your code until the host connects to the gamepad. Afterwards, operate the gamepad normally and observe the console log output.
 - **Important**: When setting the button mask, **do not use the `Home` button alone**. Long-pressing the `Home` button will cause the gamepad to power off, thereby interrupting the connection. If you do need to use the `Home` button, be sure to use it in a combination (e.g., `Home` + `Cross`).
+
+## Button Mask Connection Explained
+
+Details: [Button Mask Connection Explained](../../../codex_pad_guide/blob/main/button_mask_connection_explained.md#button-mask-connection-explained)
 
 ## License
 
