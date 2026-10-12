@@ -65,28 +65,25 @@ def connect(button_mask):
     while True:
         try:
             print(f"Scanning and connecting to CodexPad with button mask: 0x{button_mask:08X}")
-            codex_pad_obj.scan_and_connect(button_mask, scan_duration_ms=1000, connect_timeout_ms=2000)
-            print(f"Remote device name: {codex_pad_obj.remote_device_name}")
-            print(f"Remote model number: {codex_pad_obj.remote_model_number}")
+            codex_pad_client.connect_by_button_mask(button_mask, scan_duration_ms=1000, connect_timeout_ms=2000)
+            print(f"Remote device name: {codex_pad_client.remote_device_name}")
+            print(f"Remote model number: {codex_pad_client.remote_model_number}")
             print(
-                f"Remote firmware version: {codex_pad_obj.remote_firmware_version_major}.{codex_pad_obj.remote_firmware_version_minor}.{codex_pad_obj.remote_firmware_version_patch}"
+                f"Remote firmware version: {codex_pad_client.remote_firmware_version_major}.{codex_pad_client.remote_firmware_version_minor}.{codex_pad_client.remote_firmware_version_patch}"
             )
-            print(f"Remote Bluetooth Device Address: {codex_pad_obj.remote_bluetooth_device_address}")
-
-            # 设置发射功率为0dBm
-            # 发射功率影响通信距离和功耗：功率越高，通信距离越远，但功耗也越大
-            # 建议根据实际应用场景选择合适的功率等级以平衡距离和电池寿命
-            # Set transmission power to 0dBm
-            # Transmission power affects communication range and power consumption:
-            # Higher power provides longer range but consumes more battery
-            # Choose appropriate power level based on your application to balance range and battery life
-            codex_pad_obj.set_remote_tx_power(codex_pad.TX_POWER_0_DBM)
+            print(f"Remote address: {codex_pad_client.remote_address}")
             print("Connected")
             return
         except codex_pad.CodexPadNotFoundError as e:
             print(f"{e}, trying again...")
         except asyncio.TimeoutError:
             print("Connection timed out, trying again...")
+        except TypeError as e:
+            print(f"TypeError: {e}")
+            raise e
+        except ValueError as e:
+            print(f"ValueError: {e}")
+            raise e
         except Exception as e:
             print(f"Connection failed: {e}, trying again...")
             import aioble
@@ -96,7 +93,7 @@ def connect(button_mask):
 
 # Set up
 print("codex_pad library version:", codex_pad.__version__)
-codex_pad_obj = codex_pad.CodexPad()
+codex_pad_client = codex_pad.CodexPadClient()
 
 connect(_BUTTON_MASK)
 
@@ -109,9 +106,9 @@ while True:
     # Important: update() method must be called as frequently as possible in the loop, no delays should be added
     # This method processes all received Bluetooth packets, delays will cause data loss and response lag
     # For real-time control applications, high-frequency calls are essential to ensure prompt response to gamepad input
-    codex_pad_obj.update()
+    codex_pad_client.update()
 
-    if not codex_pad_obj.is_connected:
+    if not codex_pad_client.is_connected:
         print("Disconnected from device, trying to reconnect...")
         connect(_BUTTON_MASK)
         continue
@@ -141,18 +138,18 @@ while True:
     ):
         # 检测按钮是否刚刚按下（从弹起变为按下）
         # Check if button was just pressed (transition from released to pressed)
-        if codex_pad_obj.pressed(button):
-            print(f"Button {button_to_string(button)}: pressed")
+        if codex_pad_client.pressed(button):
+            print(f"Button mask: 0x{codex_pad_client.button_mask:08X}, button {button_to_string(button)}: pressed")
 
         # 检测按钮是否刚刚释放（从按下变为弹起）
         # Check if button was just released (transition from pressed to released)
-        elif codex_pad_obj.released(button):
-            print(f"Button {button_to_string(button)}: released")
+        elif codex_pad_client.released(button):
+            print(f"Button mask: 0x{codex_pad_client.button_mask:08X}, button {button_to_string(button)}: released")
 
         # 检测按钮是否持续按下状态
         # Check if button is holding
-        elif codex_pad_obj.holding(button):
-            print(f"Button {button_to_string(button)}: holding")
+        elif codex_pad_client.holding(button):
+            print(f"Button mask: 0x{codex_pad_client.button_mask:08X}, button {button_to_string(button)}: holding")
 
     # 检测摇杆轴值是否发生了有效变化（使用阈值避免微小抖动）
     # 阈值设置为2，只有当摇杆值变化达到或超过2个单位时才认为是有效变化
@@ -163,14 +160,14 @@ while True:
     # 检测摇杆X轴或Y轴是否有显著变化
     # Check if stick X or Y axis has significant change
     if (
-        codex_pad_obj.has_axis_value_changed(codex_pad.AXIS_LEFT_STICK_X, _AXIS_VALUE_CHANGE_THRESHOLD)
-        or codex_pad_obj.has_axis_value_changed(codex_pad.AXIS_LEFT_STICK_Y, _AXIS_VALUE_CHANGE_THRESHOLD)
-        or codex_pad_obj.has_axis_value_changed(codex_pad.AXIS_RIGHT_STICK_X, _AXIS_VALUE_CHANGE_THRESHOLD)
-        or codex_pad_obj.has_axis_value_changed(codex_pad.AXIS_RIGHT_STICK_Y, _AXIS_VALUE_CHANGE_THRESHOLD)
+        codex_pad_client.has_axis_value_changed(codex_pad.AXIS_LEFT_STICK_X, _AXIS_VALUE_CHANGE_THRESHOLD)
+        or codex_pad_client.has_axis_value_changed(codex_pad.AXIS_LEFT_STICK_Y, _AXIS_VALUE_CHANGE_THRESHOLD)
+        or codex_pad_client.has_axis_value_changed(codex_pad.AXIS_RIGHT_STICK_X, _AXIS_VALUE_CHANGE_THRESHOLD)
+        or codex_pad_client.has_axis_value_changed(codex_pad.AXIS_RIGHT_STICK_Y, _AXIS_VALUE_CHANGE_THRESHOLD)
     ):
         print(
-            f"L(X: {codex_pad_obj.axis_value(codex_pad.AXIS_LEFT_STICK_X):>3},",
-            f"Y: {codex_pad_obj.axis_value(codex_pad.AXIS_LEFT_STICK_Y):>3})",
-            f"R(X: {codex_pad_obj.axis_value(codex_pad.AXIS_RIGHT_STICK_X):>3},",
-            f"Y: {codex_pad_obj.axis_value(codex_pad.AXIS_RIGHT_STICK_Y):>3})",
+            f"L(X: {codex_pad_client.axis_value(codex_pad.AXIS_LEFT_STICK_X):>3},",
+            f"Y: {codex_pad_client.axis_value(codex_pad.AXIS_LEFT_STICK_Y):>3})",
+            f"R(X: {codex_pad_client.axis_value(codex_pad.AXIS_RIGHT_STICK_X):>3},",
+            f"Y: {codex_pad_client.axis_value(codex_pad.AXIS_RIGHT_STICK_Y):>3})",
         )

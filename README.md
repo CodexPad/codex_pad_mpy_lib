@@ -30,7 +30,6 @@ The following table lists the available hardware platforms that we have tested:
   - **Button Mask Connection**: By scanning for and matching a specific combination of buttons held down on the target controller (defined as a "button mask" in your code), the library automatically connects to the device with the strongest signal (highest RSSI), enabling fast and flexible pairing.
 - **Real-time Button Event Detection**: Reads the input status of all buttons in real time, distinguishing between **Pressed**, **Released**, and **Holding** events.
 - **High-Precision Joystick Data**: Retrieves analog values for the X and Y axes of the left and right joysticks, ranging from 0 to 255, providing precise control input.
-- **Adjustable Transmit Power**: Allows dynamic adjustment of the Bluetooth transmit power within a range of **-16 dBm to +6 dBm** based on the application scenario (e.g., distance, power requirements).
 
 ## Usage Instructions
 
@@ -136,7 +135,7 @@ __import__('aioble'); print('aioble library is ready')
 
 1. **Download the library file**
 
-    **Download link**: [codex_pad_mpy_lib-x.x.x.zip](../../../codex_pad_mpy_lib/archive/refs/tags/v3.0.1.zip)
+    **Download link**: [codex_pad_mpy_lib-x.x.x.zip](../../../codex_pad_mpy_lib/archive/refs/tags/v4.0.0.zip)
 
 2. **Extract the files**
 
